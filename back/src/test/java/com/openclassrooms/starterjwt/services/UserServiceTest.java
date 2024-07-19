@@ -20,6 +20,7 @@ class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
     @InjectMocks
     private UserService userService;
 
@@ -27,10 +28,7 @@ class UserServiceTest {
 
     @BeforeEach
     public void setup() {
-        //userRepository = Mockito.mock(UserRepository.class);
-        //userService = new UserService(userRepository);
-
-        this.user = User.builder()
+        user = User.builder()
                 .id(1L)
                 .firstName("test_firstname")
                 .lastName("test_lastname")
@@ -42,8 +40,7 @@ class UserServiceTest {
                 .build();
     }
 
-    //JUnit test for findById method
-    @DisplayName("Junit test for find user by id operation")
+    @DisplayName("JUnit test for find user by id operation")
     @Test
     public void givenUserId_whenFindById_thenReturnUserObject() {
         // given - precondition or setup
@@ -54,10 +51,15 @@ class UserServiceTest {
 
         // then - verify the output
         Assertions.assertNotNull(foundUser);
+        Assertions.assertEquals(user.getId(), foundUser.getId());
+        Assertions.assertEquals(user.getEmail(), foundUser.getEmail());
+        Assertions.assertEquals(user.getFirstName(), foundUser.getFirstName());
+        Assertions.assertEquals(user.getLastName(), foundUser.getLastName());
+        Assertions.assertEquals(user.getPassword(), foundUser.getPassword());
+        Assertions.assertEquals(user.isAdmin(), foundUser.isAdmin());
     }
 
-    //JUnit test for delete  method
-    @DisplayName("Junit test for delete user by id operation")
+    @DisplayName("JUnit test for delete user by id operation")
     @Test
     public void givenUserId_whenDeleteUser_thenNothing() {
         // given - precondition or setup
@@ -70,6 +72,4 @@ class UserServiceTest {
         // then - verify the output
         BDDMockito.verify(userRepository, BDDMockito.times(1)).deleteById(userId);
     }
-
-
 }

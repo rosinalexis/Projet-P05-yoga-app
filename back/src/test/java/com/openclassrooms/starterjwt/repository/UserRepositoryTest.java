@@ -20,6 +20,7 @@ import java.util.Optional;
 @TestPropertySource("classpath:application-test.properties")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class UserRepositoryTest {
+
     @Autowired
     private UserRepository userRepository;
 
@@ -27,7 +28,7 @@ public class UserRepositoryTest {
 
     @BeforeEach
     public void setUp() {
-        this.user = User.builder()
+        user = User.builder()
                 .firstName("test_firstname")
                 .lastName("test_lastname")
                 .email("test@test.fr")
@@ -38,16 +39,15 @@ public class UserRepositoryTest {
                 .build();
     }
 
-    // Junit test for save user operation
-    @DisplayName("Junit test for save a user operation")
+    @DisplayName("JUnit test for save user operation")
     @Test
     public void givenUserObject_whenSave_thenReturnSavedUser() {
+        // given - precondition or setup
 
-        //given - precondition or setup
-        // when - action or the behaviour that we are going to test
+        // when - action or the behavior that we are going to test
         User savedUser = userRepository.save(user);
 
-        //then -verify the output
+        // then - verify the output
         Assertions.assertThat(savedUser).isNotNull();
         Assertions.assertThat(savedUser.getId()).isGreaterThan(0);
         Assertions.assertThat(savedUser.getFirstName()).isEqualTo("test_firstname");
@@ -59,12 +59,10 @@ public class UserRepositoryTest {
         Assertions.assertThat(savedUser.getUpdatedAt()).isNotNull();
     }
 
-    //JUnit test for all users operations
-    @DisplayName("Junit test for get all users operation")
+    @DisplayName("JUnit test for get all users operation")
     @Test
     public void givenUserList_whenFindAll_thenUserListIsReturned() {
-
-        //given - precondition or setup
+        // given - precondition or setup
         User user1 = User.builder()
                 .firstName("test1_firstname")
                 .lastName("test1_lastname")
@@ -78,88 +76,83 @@ public class UserRepositoryTest {
         userRepository.save(user);
         userRepository.save(user1);
 
-        // when - action or the behaviour that we are going to test
+        // when - action or the behavior that we are going to test
         List<User> userList = userRepository.findAll();
 
-        //then -verify the output
+        // then - verify the output
         Assertions.assertThat(userList).isNotNull();
         Assertions.assertThat(userList.size()).isEqualTo(2);
     }
 
-    //JUnit test for get user by id operation
-    @DisplayName("Junit test for find user by id operation")
+    @DisplayName("JUnit test for find user by id operation")
     @Test
     public void givenUserObject_whenFindById_thenReturnUser() {
-        //given - precondition  or setup
+        // given - precondition or setup
         userRepository.save(user);
 
-        //when - action or the behavior that we are going test
+        // when - action or the behavior that we are going test
         User userDb = userRepository.findById(user.getId()).get();
 
-
-        //then -verify the output
+        // then - verify the output
         Assertions.assertThat(userDb).isNotNull();
+        Assertions.assertThat(userDb.getId()).isEqualTo(user.getId());
     }
 
-    //JUnit test for find User by Email
-    @DisplayName("Junit test for find user by Email operation")
+    @DisplayName("JUnit test for find user by email operation")
     @Test
     public void givenUserObject_whenFindByEmail_thenReturnUser() {
-        //given - precondition  or setup
+        // given - precondition or setup
         userRepository.save(user);
 
-        //when - action or the behavior that we are going test
+        // when - action or the behavior that we are going test
         User userDb = userRepository.findByEmail(user.getEmail()).get();
 
-
-        //then -verify the output
+        // then - verify the output
         Assertions.assertThat(userDb).isNotNull();
+        Assertions.assertThat(userDb.getEmail()).isEqualTo(user.getEmail());
     }
 
-    //JUnit test for check if User/Email already exist
-    @DisplayName("Junit test for check is user/email already exist operation")
+    @DisplayName("JUnit test for check if user/email already exists operation")
     @Test
-    public void givenUserObject_whenExistByEmail_thenReturnTrue() {
-        //given - precondition  or setup
+    public void givenUserObject_whenExistsByEmail_thenReturnTrue() {
+        // given - precondition or setup
         userRepository.save(user);
 
-        //when - action or the behavior that we are going test
-        Boolean isEmailExisted = userRepository.existsByEmail(user.getEmail());
+        // when - action or the behavior that we are going test
+        boolean isEmailExisted = userRepository.existsByEmail(user.getEmail());
 
-        //then -verify the output
+        // then - verify the output
         Assertions.assertThat(isEmailExisted).isTrue();
     }
 
-    //JUnit test for update User operation
-    @DisplayName("Junit test for update user operation")
+    @DisplayName("JUnit test for update user operation")
     @Test
     public void givenUserObject_whenUpdateUser_thenReturnUpdatedUser() {
-        //given - precondition  or setup
+        // given - precondition or setup
         userRepository.save(user);
 
-        //when - action or the behavior that we are going test
-        User saveduser = userRepository.findById(user.getId()).get();
-        saveduser.setEmail("test_updated@test.fr");
-        saveduser.setPassword("test_updated_password");
+        // when - action or the behavior that we are going test
+        User savedUser = userRepository.findById(user.getId()).get();
+        savedUser.setEmail("test_updated@test.fr");
+        savedUser.setPassword("test_updated_password");
 
-        User updatedUser = userRepository.save(saveduser);
+        User updatedUser = userRepository.save(savedUser);
 
-        //then -verify the output
+        // then - verify the output
         Assertions.assertThat(updatedUser.getEmail()).isEqualTo("test_updated@test.fr");
         Assertions.assertThat(updatedUser.getPassword()).isEqualTo("test_updated_password");
     }
 
-    //JUnit test for delete User operation
-    @DisplayName("Junit test for delete user operation")
+    @DisplayName("JUnit test for delete user operation")
     @Test
     public void givenUserObject_whenDelete_thenRemoveUser() {
-        //given - precondition  or setup
+        // given - precondition or setup
         userRepository.save(user);
 
-        //when - action or the behavior that we are going test
+        // when - action or the behavior that we are going test
         userRepository.delete(user);
 
-        //then -verify the output
+        // then - verify the output
         Optional<User> userOptional = userRepository.findById(user.getId());
         Assertions.assertThat(userOptional).isEmpty();
     }
