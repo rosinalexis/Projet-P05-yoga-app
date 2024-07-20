@@ -3,6 +3,7 @@ package com.openclassrooms.starterjwt.services;
 import com.openclassrooms.starterjwt.models.Teacher;
 import com.openclassrooms.starterjwt.repository.TeacherRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
@@ -41,6 +42,7 @@ class TeacherServiceTest {
                 .build();
     }
 
+    @DisplayName("JUnit test for findAll operation when teacher repository returns a list of teachers")
     @Test
     void givenTeacherRepository_whenFindAll_thenReturnListOfTeachers() {
         // given
@@ -58,6 +60,7 @@ class TeacherServiceTest {
         assertThat(teacherList.get(0).getLastName()).isEqualTo(teacher.getLastName());
     }
 
+    @DisplayName("JUnit test for findById operation when teacher repository returns a teacher")
     @Test
     void givenTeacherRepository_whenFindById_thenReturnTeacher() {
         // given
@@ -72,6 +75,7 @@ class TeacherServiceTest {
         assertThat(result.getLastName()).isEqualTo(teacher.getLastName());
     }
 
+    @DisplayName("JUnit test for findById operation when teacher repository returns no teacher")
     @Test
     void givenTeacherRepository_whenFindByIdNotFound_thenReturnNull() {
         // given

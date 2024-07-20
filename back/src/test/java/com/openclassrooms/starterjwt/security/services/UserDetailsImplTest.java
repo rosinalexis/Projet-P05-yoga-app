@@ -25,7 +25,7 @@ public class UserDetailsImplTest {
                 .build();
     }
 
-    @DisplayName("Given a UserDetailsImpl object, when getAuthorities is called, then it should return an empty collection")
+    @DisplayName("JUnit test for given a UserDetailsImpl object, when getAuthorities is called, then it should return an empty collection")
     @Test
     void givenUserDetailsImpl_whenGetAuthorities_thenReturnEmptyCollection() {
         // when
@@ -36,7 +36,7 @@ public class UserDetailsImplTest {
         assertThat(authorities).isEmpty();
     }
 
-    @DisplayName("Given a UserDetailsImpl object, when isAccountNonExpired is called, then it should return true")
+    @DisplayName("JUnit test for given a UserDetailsImpl object, when isAccountNonExpired is called, then it should return true")
     @Test
     void givenUserDetailsImpl_whenIsAccountNonExpired_thenReturnTrue() {
         // when
@@ -46,7 +46,7 @@ public class UserDetailsImplTest {
         assertThat(isAccountNonExpired).isTrue();
     }
 
-    @DisplayName("Given a UserDetailsImpl object, when isAccountNonLocked is called, then it should return true")
+    @DisplayName("JUnit test for given a UserDetailsImpl object, when isAccountNonLocked is called, then it should return true")
     @Test
     void givenUserDetailsImpl_whenIsAccountNonLocked_thenReturnTrue() {
         // when
@@ -56,7 +56,7 @@ public class UserDetailsImplTest {
         assertThat(isAccountNonLocked).isTrue();
     }
 
-    @DisplayName("Given a UserDetailsImpl object, when isCredentialsNonExpired is called, then it should return true")
+    @DisplayName("JUnit test for given a UserDetailsImpl object, when isCredentialsNonExpired is called, then it should return true")
     @Test
     void givenUserDetailsImpl_whenIsCredentialsNonExpired_thenReturnTrue() {
         // when
@@ -66,7 +66,7 @@ public class UserDetailsImplTest {
         assertThat(isCredentialsNonExpired).isTrue();
     }
 
-    @DisplayName("Given a UserDetailsImpl object, when isEnabled is called, then it should return true")
+    @DisplayName("JUnit test for given a UserDetailsImpl object, when isEnabled is called, then it should return true")
     @Test
     void givenUserDetailsImpl_whenIsEnabled_thenReturnTrue() {
         // when
@@ -76,7 +76,7 @@ public class UserDetailsImplTest {
         assertThat(isEnabled).isTrue();
     }
 
-    @DisplayName("Given two UserDetailsImpl objects with the same ID, when compared, then they should be equal")
+    @DisplayName("JUnit test for given two UserDetailsImpl objects with the same ID, when compared, then they should be equal")
     @Test
     void givenUserDetailsWithSameId_whenEquals_thenReturnTrue() {
         // given
@@ -93,7 +93,7 @@ public class UserDetailsImplTest {
         assertThat(userDetails).isEqualTo(userDetailsSame);
     }
 
-    @DisplayName("Given two UserDetailsImpl objects with different IDs, when compared, then they should not be equal")
+    @DisplayName("JUnit test for given two UserDetailsImpl objects with different IDs, when compared, then they should not be equal")
     @Test
     void givenUserDetailsWithDifferentId_whenEquals_thenReturnFalse() {
         // given
@@ -110,7 +110,7 @@ public class UserDetailsImplTest {
         assertThat(userDetails).isNotEqualTo(userDetailsDifferent);
     }
 
-    @DisplayName("Given two UserDetailsImpl objects with different IDs, when comparing hashCodes, then they should not be equal")
+    @DisplayName("JUnit test for given two UserDetailsImpl objects with different IDs, when comparing hashCodes, then they should not be equal")
     @Test
     void givenUserDetailsWithDifferentId_whenHashCode_thenReturnDifferentHashCode() {
         // given

@@ -20,7 +20,7 @@ public class TeacherMapperTest {
         teacherMapper = Mappers.getMapper(TeacherMapper.class);
     }
 
-    @DisplayName("Convert Teacher to TeacherDto should match expected values")
+    @DisplayName("JUnit test for convert Teacher to TeacherDto should match expected values")
     @Test
     public void givenTeacher_whenConvertToDto_thenDtoShouldMatch() {
         // Given
@@ -46,7 +46,7 @@ public class TeacherMapperTest {
         assertEquals(expectedDto, resultDto);
     }
 
-    @DisplayName("Convert TeacherDto to Teacher should match expected values")
+    @DisplayName("JUnit test for convert TeacherDto to Teacher should match expected values")
     @Test
     public void givenTeacherDto_whenConvertToEntity_thenEntityShouldMatch() {
         // Given

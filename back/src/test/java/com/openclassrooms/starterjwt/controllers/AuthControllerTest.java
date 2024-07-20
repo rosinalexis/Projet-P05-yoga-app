@@ -109,7 +109,7 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.admin").value(user.isAdmin()))
                 .andDo(print());
     }
-    
+
     @DisplayName("JUnit test for register user with valid details")
     @Test
     public void givenValidDetails_whenRegisterUser_thenReturnSuccess() throws Exception {

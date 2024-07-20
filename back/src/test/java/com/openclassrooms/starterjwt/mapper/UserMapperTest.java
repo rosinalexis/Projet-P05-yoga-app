@@ -18,7 +18,7 @@ public class UserMapperTest {
         userMapper = Mappers.getMapper(UserMapper.class);
     }
 
-    @DisplayName("Convert User to UserDto should match expected values")
+    @DisplayName("JUnit test for convert User to UserDto should match expected values")
     @Test
     public void givenUser_whenConvertToDto_thenDtoShouldMatch() {
         // Given
@@ -45,7 +45,7 @@ public class UserMapperTest {
         assertEquals(expectedDto, resultDto);
     }
 
-    @DisplayName("Convert UserDto to User should match expected values")
+    @DisplayName("JUnit test for convert UserDto to User should match expected values")
     @Test
     public void givenUserDto_whenConvertToEntity_thenEntityShouldMatch() {
         // Given
