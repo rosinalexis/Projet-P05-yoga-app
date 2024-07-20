@@ -52,11 +52,14 @@ class SessionControllerTest {
 
     @BeforeEach
     void setUp() {
+        Teacher teacher = new Teacher();
+        teacher.setId(1L);
+
         session = Session.builder()
                 .id(1L)
                 .name("Test Session")
                 .date(new Date())
-                .teacher(new Teacher())
+                .teacher(teacher)
                 .description("Test Description")
                 .build();
 
@@ -75,9 +78,10 @@ class SessionControllerTest {
         BDDMockito.given(sessionService.getById(anyLong())).willReturn(session);
         BDDMockito.given(sessionMapper.toDto(any(Session.class))).willReturn(sessionDto);
 
-        // when & then
+        // when
         mockMvc.perform(MockMvcRequestBuilders.get("/api/session/{id}", 1L)
                         .contentType(MediaType.APPLICATION_JSON))
+                // then
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(sessionDto.getId()))
                 .andExpect(jsonPath("$.name").value(sessionDto.getName()));
@@ -89,10 +93,21 @@ class SessionControllerTest {
         // given
         BDDMockito.given(sessionService.getById(anyLong())).willReturn(null);
 
-        // when & then
+        // when
         mockMvc.perform(MockMvcRequestBuilders.get("/api/session/{id}", 1L)
                         .contentType(MediaType.APPLICATION_JSON))
+                // then
                 .andExpect(status().isNotFound());
+    }
+
+    @DisplayName("JUnit test for findById operation - NumberFormatException")
+    @Test
+    void givenInvalidSessionIdFormat_whenFindById_thenReturnBadRequest() throws Exception {
+        // when
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/session/{id}", "invalid")
+                        .contentType(MediaType.APPLICATION_JSON))
+                // then
+                .andExpect(status().isBadRequest());
     }
 
     @DisplayName("JUnit test for findAll operation")
@@ -106,9 +121,10 @@ class SessionControllerTest {
         BDDMockito.given(sessionService.findAll()).willReturn(sessions);
         BDDMockito.given(sessionMapper.toDto(sessions)).willReturn(sessionDtos);
 
-        // when & then
+        // when
         mockMvc.perform(MockMvcRequestBuilders.get("/api/session")
                         .contentType(MediaType.APPLICATION_JSON))
+                // then
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(sessionDto.getId()))
                 .andExpect(jsonPath("$[0].name").value(sessionDto.getName()));
@@ -122,13 +138,28 @@ class SessionControllerTest {
         BDDMockito.given(sessionMapper.toEntity(any(SessionDto.class))).willReturn(session);
         BDDMockito.given(sessionMapper.toDto(any(Session.class))).willReturn(sessionDto);
 
-        // when & then
+        // when
         mockMvc.perform(MockMvcRequestBuilders.post("/api/session")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sessionDto)))
+                // then
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(sessionDto.getId()))
                 .andExpect(jsonPath("$.name").value(sessionDto.getName()));
+    }
+
+    @DisplayName("JUnit test for create session operation - invalid input")
+    @Test
+    void givenInvalidSessionDto_whenCreate_thenReturnBadRequest() throws Exception {
+        // given
+        sessionDto.setName("");
+
+        // when
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/session")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(sessionDto)))
+                // then
+                .andExpect(status().isBadRequest());
     }
 
     @DisplayName("JUnit test for update session operation")
@@ -139,13 +170,39 @@ class SessionControllerTest {
         BDDMockito.given(sessionMapper.toEntity(any(SessionDto.class))).willReturn(session);
         BDDMockito.given(sessionMapper.toDto(any(Session.class))).willReturn(sessionDto);
 
-        // when & then
+        // when
         mockMvc.perform(MockMvcRequestBuilders.put("/api/session/{id}", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sessionDto)))
+                // then
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(sessionDto.getId()))
                 .andExpect(jsonPath("$.name").value(sessionDto.getName()));
+    }
+
+    @DisplayName("JUnit test for update session operation - invalid input")
+    @Test
+    void givenInvalidSessionDto_whenUpdate_thenReturnBadRequest() throws Exception {
+        // given
+        sessionDto.setName("");
+
+        // when
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/session/{id}", 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(sessionDto)))
+                // then
+                .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("JUnit test for update session operation - NumberFormatException")
+    @Test
+    void givenInvalidSessionIdFormat_whenUpdate_thenReturnBadRequest() throws Exception {
+        // when
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/session/{id}", "invalid")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(sessionDto)))
+                // then
+                .andExpect(status().isBadRequest());
     }
 
     @DisplayName("JUnit test for delete session operation")
@@ -154,33 +211,99 @@ class SessionControllerTest {
         // given
         BDDMockito.given(sessionService.getById(anyLong())).willReturn(session);
 
-        // when & then
+        // when
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/session/{id}", 1L)
                         .contentType(MediaType.APPLICATION_JSON))
+                // then
                 .andExpect(status().isOk());
 
         verify(sessionService, times(1)).delete(anyLong());
     }
 
+    @DisplayName("JUnit test for delete session operation - session not found")
+    @Test
+    void givenInvalidSessionId_whenDelete_thenReturnNotFound() throws Exception {
+        // given
+        BDDMockito.given(sessionService.getById(anyLong())).willReturn(null);
+
+        // when
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/session/{id}", 1L)
+                        .contentType(MediaType.APPLICATION_JSON))
+                // then
+                .andExpect(status().isNotFound());
+    }
+
+    @DisplayName("JUnit test for delete session operation - NumberFormatException")
+    @Test
+    void givenInvalidSessionIdFormat_whenDelete_thenReturnBadRequest() throws Exception {
+        // when
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/session/{id}", "invalid")
+                        .contentType(MediaType.APPLICATION_JSON))
+                // then
+                .andExpect(status().isBadRequest());
+    }
+
     @DisplayName("JUnit test for participate operation")
     @Test
     void givenSessionIdAndUserId_whenParticipate_thenReturnOk() throws Exception {
-        // when & then
+        // when
         mockMvc.perform(MockMvcRequestBuilders.post("/api/session/{id}/participate/{userId}", 1L, 1L)
                         .contentType(MediaType.APPLICATION_JSON))
+                // then
                 .andExpect(status().isOk());
 
         verify(sessionService, times(1)).participate(anyLong(), anyLong());
     }
 
+    @DisplayName("JUnit test for participate operation - NumberFormatException")
+    @Test
+    void givenInvalidSessionIdFormat_whenParticipate_thenReturnBadRequest() throws Exception {
+        // when
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/session/{id}/participate/{userId}", "invalid", 1L)
+                        .contentType(MediaType.APPLICATION_JSON))
+                // then
+                .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("JUnit test for participate operation - NumberFormatException for userId")
+    @Test
+    void givenInvalidUserIdFormat_whenParticipate_thenReturnBadRequest() throws Exception {
+        // when
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/session/{id}/participate/{userId}", 1L, "invalid")
+                        .contentType(MediaType.APPLICATION_JSON))
+                // then
+                .andExpect(status().isBadRequest());
+    }
+
     @DisplayName("JUnit test for no longer participate operation")
     @Test
     void givenSessionIdAndUserId_whenNoLongerParticipate_thenReturnOk() throws Exception {
-        // when & then
+        // when
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/session/{id}/participate/{userId}", 1L, 1L)
                         .contentType(MediaType.APPLICATION_JSON))
+                // then
                 .andExpect(status().isOk());
 
         verify(sessionService, times(1)).noLongerParticipate(anyLong(), anyLong());
+    }
+
+    @DisplayName("JUnit test for no longer participate operation - NumberFormatException")
+    @Test
+    void givenInvalidSessionIdFormat_whenNoLongerParticipate_thenReturnBadRequest() throws Exception {
+        // when
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/session/{id}/participate/{userId}", "invalid", 1L)
+                        .contentType(MediaType.APPLICATION_JSON))
+                // then
+                .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("JUnit test for no longer participate operation - NumberFormatException for userId")
+    @Test
+    void givenInvalidUserIdFormat_whenNoLongerParticipate_thenReturnBadRequest() throws Exception {
+        // when
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/session/{id}/participate/{userId}", 1L, "invalid")
+                        .contentType(MediaType.APPLICATION_JSON))
+                // then
+                .andExpect(status().isBadRequest());
     }
 }

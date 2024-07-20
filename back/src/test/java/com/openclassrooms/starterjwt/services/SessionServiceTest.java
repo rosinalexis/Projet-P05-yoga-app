@@ -1,6 +1,7 @@
 package com.openclassrooms.starterjwt.services;
 
 import com.openclassrooms.starterjwt.exception.BadRequestException;
+import com.openclassrooms.starterjwt.exception.NotFoundException;
 import com.openclassrooms.starterjwt.models.Session;
 import com.openclassrooms.starterjwt.models.User;
 import com.openclassrooms.starterjwt.repository.SessionRepository;
@@ -21,6 +22,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -89,10 +91,10 @@ class SessionServiceTest {
     @Test
     void whenFindAll_thenReturnSessionList() {
         // given
-        List<Session> t = new ArrayList<>();
-        t.add(session);
+        List<Session> sessions = new ArrayList<>();
+        sessions.add(session);
 
-        BDDMockito.given(sessionRepository.findAll()).willReturn(t);
+        BDDMockito.given(sessionRepository.findAll()).willReturn(sessions);
 
         // when
         List<Session> sessionList = sessionService.findAll();
@@ -177,5 +179,69 @@ class SessionServiceTest {
 
         // when & then
         assertThrows(BadRequestException.class, () -> sessionService.noLongerParticipate(1L, 2L));
+    }
+
+    @DisplayName("JUnit test for participate in session with invalid session id")
+    @Test
+    void givenInvalidSessionId_whenParticipate_thenThrowNotFoundException() {
+        // given
+        BDDMockito.given(sessionRepository.findById(anyLong())).willReturn(Optional.empty());
+        BDDMockito.given(userRepository.findById(1L)).willReturn(Optional.of(user));
+
+        // when & then
+        assertThrows(NotFoundException.class, () -> sessionService.participate(1L, 1L));
+    }
+
+    @DisplayName("JUnit test for participate in session with invalid user id")
+    @Test
+    void givenInvalidUserId_whenParticipate_thenThrowNotFoundException() {
+        // given
+        BDDMockito.given(sessionRepository.findById(1L)).willReturn(Optional.of(session));
+        BDDMockito.given(userRepository.findById(anyLong())).willReturn(Optional.empty());
+
+        // when & then
+        assertThrows(NotFoundException.class, () -> sessionService.participate(1L, 1L));
+    }
+
+    @DisplayName("JUnit test for no longer participate in session with invalid session id")
+    @Test
+    void givenInvalidSessionId_whenNoLongerParticipate_thenThrowNotFoundException() {
+        // given
+        BDDMockito.given(sessionRepository.findById(anyLong())).willReturn(Optional.empty());
+
+        // when & then
+        assertThrows(NotFoundException.class, () -> sessionService.noLongerParticipate(1L, 1L));
+    }
+
+    @DisplayName("JUnit test for create session with invalid session data")
+    @Test
+    void givenInvalidSessionObject_whenCreate_thenThrowBadRequestException() {
+        // given
+        BDDMockito.given(sessionRepository.save(any(Session.class))).willThrow(new NumberFormatException());
+
+        // when & then
+        assertThrows(NumberFormatException.class, () -> sessionService.create(session));
+    }
+
+    @DisplayName("JUnit test for participate in session with invalid session data")
+    @Test
+    void givenInvalidSessionData_whenParticipate_thenThrowNumberFormatException() {
+        // given
+        session.getUsers().add(user);
+        BDDMockito.given(sessionRepository.findById(anyLong())).willReturn(Optional.of(session));
+        BDDMockito.given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
+
+        // when & then
+        assertThrows(BadRequestException.class, () -> sessionService.participate(1L, 1L));
+    }
+
+    @DisplayName("JUnit test for no longer participate in session with invalid session data")
+    @Test
+    void givenInvalidSessionData_whenNoLongerParticipate_thenThrowNumberFormatException() {
+        // given
+        BDDMockito.given(sessionRepository.findById(anyLong())).willThrow(new NumberFormatException());
+
+        // when & then
+        assertThrows(NumberFormatException.class, () -> sessionService.noLongerParticipate(1L, 1L));
     }
 }
