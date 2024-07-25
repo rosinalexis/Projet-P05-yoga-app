@@ -1,6 +1,9 @@
 package com.openclassrooms.starterjwt.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openclassrooms.starterjwt.models.User;
+import com.openclassrooms.starterjwt.payload.request.LoginRequest;
+import com.openclassrooms.starterjwt.payload.request.SignupRequest;
 import com.openclassrooms.starterjwt.payload.response.JwtResponse;
 import com.openclassrooms.starterjwt.repository.UserRepository;
 import com.openclassrooms.starterjwt.security.jwt.JwtUtils;
@@ -10,7 +13,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -30,7 +32,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @SpringBootTest
-@AutoConfigureJsonTesters
 @AutoConfigureMockMvc(addFilters = false)
 class AuthControllerTest {
 
@@ -42,6 +43,9 @@ class AuthControllerTest {
 
     @MockBean
     private JwtUtils jwtUtils;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @MockBean
     private UserRepository userRepository;
@@ -85,7 +89,10 @@ class AuthControllerTest {
     @Test
     public void givenValidCredentials_whenAuthenticateUser_thenReturnJwtResponse() throws Exception {
         // given
-        String loginRequestJson = "{ \"email\": \"test@test.com\", \"password\": \"test_password\" }";
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setEmail("test@test.com");
+        loginRequest.setPassword("test_password");
+
 
         Authentication authentication = Mockito.mock(Authentication.class);
         given(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).willReturn(authentication);
@@ -96,7 +103,7 @@ class AuthControllerTest {
         // when
         ResultActions response = mockMvc.perform(post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(loginRequestJson));
+                .content(objectMapper.writeValueAsString(loginRequest)));
 
         // then
         response.andExpect(status().isOk())
@@ -114,7 +121,13 @@ class AuthControllerTest {
     @Test
     public void givenValidDetails_whenRegisterUser_thenReturnSuccess() throws Exception {
         // given
-        String signUpRequestJson = "{ \"email\": \"newuser@test.com\", \"password\": \"123456\", \"firstName\": \"Test_User\", \"lastName\": \"test_mana\" }";
+
+        SignupRequest signupRequest = new SignupRequest();
+        signupRequest.setEmail("newuser@test.com");
+        signupRequest.setPassword("123456");
+        signupRequest.setFirstName("Test_User");
+        signupRequest.setLastName("mana");
+
 
         given(userRepository.existsByEmail("newuser@test.com")).willReturn(false);
         given(userRepository.save(any(User.class))).willReturn(user);
@@ -122,7 +135,7 @@ class AuthControllerTest {
         // when
         ResultActions response = mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(signUpRequestJson));
+                .content(objectMapper.writeValueAsString(signupRequest)));
 
         // then
         response.andExpect(status().isOk())
@@ -134,14 +147,18 @@ class AuthControllerTest {
     @Test
     public void givenExistingEmail_whenRegisterUser_thenReturnBadRequest() throws Exception {
         // given
-        String signUpRequestJson = "{ \"email\": \"test@test.com\", \"password\": \"password\", \"firstName\": \"Test\", \"lastName\": \"User\" }";
+        SignupRequest signupRequest = new SignupRequest();
+        signupRequest.setEmail("test@test.com");
+        signupRequest.setPassword("123456");
+        signupRequest.setFirstName("Test");
+        signupRequest.setLastName("User");
 
         given(userRepository.existsByEmail("test@test.com")).willReturn(true);
 
         // when
         ResultActions response = mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(signUpRequestJson));
+                .content(objectMapper.writeValueAsString(signupRequest)));
 
         // then
         response.andExpect(status().isBadRequest())

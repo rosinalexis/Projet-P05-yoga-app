@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -25,13 +26,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureJsonTesters
-@AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureMockMvc()
 public class AuthControllerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private UserRepository userRepository;
@@ -50,7 +54,7 @@ public class AuthControllerIntegrationTest {
         User user = User.builder()
                 .lastName("test_lastname")
                 .firstName("test_firstname")
-                .password("$2y$10$.bTweG7FKj.k4u6FHk8K0.2nBTgtYDmi0eDs8Csku7O5bL.O3YQMe")
+                .password(passwordEncoder.encode("test_password"))
                 .admin(false)
                 .email("email@email.com")
                 .createdAt(LocalDateTime.now())

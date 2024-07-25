@@ -1,7 +1,5 @@
 package com.openclassrooms.starterjwt.integration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.openclassrooms.starterjwt.mapper.UserMapper;
 import com.openclassrooms.starterjwt.models.User;
 import com.openclassrooms.starterjwt.repository.UserRepository;
 import org.hamcrest.CoreMatchers;
@@ -13,9 +11,12 @@ import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -23,7 +24,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureJsonTesters
-@AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureMockMvc()
+@WithMockUser(username = "email@email.com", password = "test_password")
 public class UserControllerIntegrationTest {
 
     @Autowired
@@ -33,10 +35,7 @@ public class UserControllerIntegrationTest {
     private UserRepository userRepository;
 
     @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private UserMapper userMapper;
+    private PasswordEncoder passwordEncoder;
 
     private User user;
 
@@ -57,17 +56,16 @@ public class UserControllerIntegrationTest {
     @Test
     public void givenUserId_whenGetUserById_thenReturnUserDto() throws Exception {
         // given
-        Long userId = 1L;
         userRepository.save(user);
 
         // when
-        ResultActions response = mockMvc.perform(get("/api/user/{id}", userId)
+        ResultActions response = mockMvc.perform(get("/api/user/{id}", user.getId())
                 .contentType(MediaType.APPLICATION_JSON));
 
         // then
         response.andExpect(status().isOk())
                 .andDo(print())
-                .andExpect(jsonPath("$.id").value(userId))
+                .andExpect(jsonPath("$.id").value(user.getId()))
                 .andExpect(jsonPath("$.email", CoreMatchers.is(user.getEmail())))
                 .andExpect(jsonPath("$.lastName", CoreMatchers.is(user.getLastName())))
                 .andExpect(jsonPath("$.firstName", CoreMatchers.is(user.getFirstName())))
@@ -105,5 +103,17 @@ public class UserControllerIntegrationTest {
                 .andDo(print());
     }
 
+    @DisplayName("JUnit test for find a user with id operation")
+    @Test
+    public void givenUserId_whenDelete_thenReturn200() throws Exception {
+        // given
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(user);
 
+        // when & then
+        mockMvc.perform(delete("/api/user/{id}", user.getId())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
 }
