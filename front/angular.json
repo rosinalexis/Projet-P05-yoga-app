@@ -117,7 +117,12 @@
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "collectCoverage": true,
+            "coverageReporters": [
+              "json",
+              "html"
+            ]
           }
         },
         "cypress-run": {
