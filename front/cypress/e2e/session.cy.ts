@@ -24,6 +24,14 @@ describe('Session', () => {
 
   const SESSIONS_LIST = [SESSION];
 
+  const TEACHER = {
+    id: 1,
+    lastName: "teacher",
+    firstName: "mogo",
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  };
+
   const TEACHERS_LIST = [
     {id: 1, lastName: 'teacher', firstName: 'uno'},
     {id: 2, lastName: 'teacher', firstName: 'duo'}
@@ -53,9 +61,21 @@ describe('Session', () => {
   });
 
   it('should navigate to session detail page on button click', () => {
-    cy.intercept('GET', '/api/sessions/detail/1', SESSION).as('sessionDetail');
-    cy.get('button').contains('Detail').click();
-    cy.url().should('include', '/sessions/detail/1');
+    cy.intercept('GET', '/api/session/1', SESSION).as('sessionDetail');
+    cy.intercept('GET', '/api/teacher/1', TEACHER).as('teacherDetail');
+    cy.get('.item:first-child').as('firstSession');
+    cy.get('@firstSession').contains('button', 'Detail').should('be.visible').click();
+    cy.url().should('include', '/detail/');
+
+    cy.wait('@sessionDetail');
+    cy.wait('@teacherDetail');
+
+    cy.get('h1').contains('Session');
+    cy.get('.description').should('exist');
+
+    cy.get('.mat-card-title button[mat-icon-button]').click();
+
+    cy.url().should('include', '/sessions');
   });
 
   it('should display all required fields and enable submission when valid', () => {
@@ -75,4 +95,5 @@ describe('Session', () => {
     cy.get('button').contains('Edit').click();
     cy.url().should('include', '/sessions/update');
   });
+  
 });

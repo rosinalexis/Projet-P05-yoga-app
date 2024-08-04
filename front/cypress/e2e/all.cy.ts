@@ -1,3 +1,4 @@
+import './not-found.cy';
 import './register.cy';
 import './login.cy';
 import './account.cy';
