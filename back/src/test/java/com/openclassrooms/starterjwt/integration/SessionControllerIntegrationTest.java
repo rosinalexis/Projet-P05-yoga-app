@@ -16,6 +16,8 @@ import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -28,6 +30,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:cleanup.sql")
+@TestPropertySource(locations = "classpath:application-test.properties")
 @AutoConfigureJsonTesters
 @AutoConfigureMockMvc(addFilters = false)
 public class SessionControllerIntegrationTest {
@@ -54,10 +58,6 @@ public class SessionControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        sessionRepository.deleteAll();
-        teacherRepository.deleteAll();
-        userRepository.deleteAll();
-        
         teacher = Teacher.builder()
                 .firstName("test_teacher")
                 .lastName("test_teacher")

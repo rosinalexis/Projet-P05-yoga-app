@@ -35,7 +35,6 @@ class SessionRepositoryTest {
 
     @BeforeEach
     void setUp() {
-
         teacher = Teacher.builder()
                 .firstName("test_first_name")
                 .lastName("test_last_name")

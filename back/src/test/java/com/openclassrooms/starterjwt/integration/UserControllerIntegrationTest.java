@@ -13,6 +13,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -23,6 +25,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:cleanup.sql")
+@TestPropertySource(locations = "classpath:application-test.properties")
 @AutoConfigureJsonTesters
 @AutoConfigureMockMvc()
 @WithMockUser(username = "email@email.com", password = "test_password")
@@ -41,8 +45,6 @@ public class UserControllerIntegrationTest {
 
     @BeforeEach
     void setup() {
-        userRepository.deleteAll();
-
         user = User.builder()
                 .lastName("test_lastname")
                 .firstName("test_firstname")
